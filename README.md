@@ -2,11 +2,11 @@
 
 A comprehensive web-based hospital drug inventory and consumption management system with AI/ML-powered predictions.
 
-## 🎯 Project Overview
+## Project Overview
 
 MediStock helps hospitals track available drugs, monitor stock levels, log daily consumption, generate low-stock alerts, and provide intelligent predictions using machine learning algorithms.
 
-## ✨ Features
+## Features
 
 ### Core Features
 - **Drug Management**: Add, edit, delete, and view drugs
@@ -30,14 +30,14 @@ MediStock helps hospitals track available drugs, monitor stock levels, log daily
 - **ML Library**: PHP-ML (PHP Machine Learning)
 - **Containerization**: Docker Compose
 
-## 📋 Prerequisites
+## Prerequisites
 
 - PHP 8.2 or higher
 - Composer
 - Docker Desktop (for MySQL database)
 - MySQL Workbench (optional, for database management)
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone the Repository
 ```bash
@@ -84,7 +84,7 @@ php -S localhost:8000 -t public
 ### 6. Access the Application
 Open your browser and navigate to: `http://localhost:8000/`
 
-## 📖 Usage
+## Usage
 
 ### Getting Started
 1. **Add Drugs**: Go to Drugs → Create new drug
@@ -116,7 +116,7 @@ Open your browser and navigate to: `http://localhost:8000/`
 2. Select a drug with consumption history
 3. View predicted consumption for next 7/14/30 days
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 medistock/
@@ -133,7 +133,7 @@ medistock/
 └── var/                 # Cache and logs
 ```
 
-## 🤖 AI/ML Features
+## AI/ML Features
 
 ### Consumption Prediction
 - Uses Moving Average and Trend Analysis
@@ -155,7 +155,7 @@ medistock/
 ### Consumption Table
 - `id`, `drug_id`, `quantity`, `consumed_at`, `logged_by`, `notes`
 
-## 🔒 Security Notes
+## Security Notes
 
 - CSRF protection enabled on all forms
 - SQL injection prevention via Doctrine ORM
@@ -182,12 +182,12 @@ This is an academic project. For collaboration:
 
 This project is for academic purposes.
 
-## 👨‍💻 Authors
+## Authors
 
-- Your Name
-- Your Teammate's Name
+- Ameya Dhurde
+- Karri Leena
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Symfony Framework
 - PHP-ML Library
@@ -196,7 +196,6 @@ This project is for academic purposes.
 
 ---
 
-**Status**: ✅ Complete and Ready for Use
 
 For detailed project information, see `PROJECT_SUMMARY.md`
 
