@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Drug Details{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Drug Details</h1>
+            <div>
+                <a href="{{ path('app_drug_index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to list
+                </a>
+                <a href="{{ path('app_drug_edit', {'id': drug.id}) }}" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="{{ path('app_stock_update', {'id': drug.id}) }}" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-down"></i> Update Stock
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th class="w-25">Id</th>
+                            <td>{{ drug.id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <td>{{ drug.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Category</th>
+                            <td>{{ drug.category }}</td>
+                        </tr>
+                        <tr>
+                            <th>Stock Quantity</th>
+                            <td>
+                                <span class="badge {% if drug.isLowStock() %}bg-danger{% else %}bg-success{% endif %} fs-6">
+                                    {{ drug.stockQuantity }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Threshold</th>
+                            <td>{{ drug.threshold }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                                {% if drug.isLowStock() %}
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-exclamation-triangle"></i> Low Stock
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success">In Stock</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Created At</th>
+                            <td>{{ drug.createdAt ? drug.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            {{ include('drug/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

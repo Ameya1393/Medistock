@@ -1,0 +1,113 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Stockout Prediction{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-exclamation-triangle-fill"></i> Stockout Prediction</h1>
+        <a href="{{ path('app_dashboard') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> 
+        This page predicts when each drug will run out of stock based on historical consumption patterns and current stock levels.
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Stockout Predictions</h5>
+        </div>
+        <div class="card-body">
+            {% if predictions|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Drug Name</th>
+                            <th>Category</th>
+                            <th>Current Stock</th>
+                            <th>Threshold</th>
+                            <th>Days Until Stockout</th>
+                            <th>Estimated Date</th>
+                            <th>Confidence</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in predictions %}
+                        {% set drug = item.drug %}
+                        {% set pred = item.prediction %}
+                        <tr class="{% if pred.isUrgent %}table-danger{% elseif pred.isWarning %}table-warning{% endif %}">
+                            <td><strong>{{ drug.name }}</strong></td>
+                            <td>{{ drug.category }}</td>
+                            <td>
+                                <span class="badge {% if drug.isLowStock() %}bg-danger{% else %}bg-success{% endif %}">
+                                    {{ drug.stockQuantity }}
+                                </span>
+                            </td>
+                            <td>{{ drug.threshold }}</td>
+                            <td>
+                                {% if pred.daysUntilStockout is not null %}
+                                    <span class="badge {% if pred.isUrgent %}bg-danger{% elseif pred.isWarning %}bg-warning{% else %}bg-info{% endif %} fs-6">
+                                        {{ pred.daysUntilStockout }} days
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success">90+ days</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if pred.estimatedDate %}
+                                    {{ pred.estimatedDate }}
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {% if pred.confidence == 'high' %}bg-success{% elseif pred.confidence == 'medium' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ pred.confidence|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if pred.isUrgent %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-exclamation-triangle-fill"></i> URGENT
+                                    </span>
+                                {% elseif pred.isWarning %}
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="bi bi-exclamation-triangle"></i> WARNING
+                                    </span>
+                                {% elseif pred.willRunOut %}
+                                    <span class="badge bg-info">PREDICTED</span>
+                                {% else %}
+                                    <span class="badge bg-success">SAFE</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ path('app_prediction_drug', {'id': drug.id}) }}" class="btn btn-sm btn-info">
+                                    <i class="bi bi-graph-up"></i> Details
+                                </a>
+                                <a href="{{ path('app_stock_update', {'id': drug.id}) }}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil-square"></i> Update Stock
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                <h4 class="mt-3">No Predictions Available</h4>
+                <p>Need consumption data to generate predictions.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

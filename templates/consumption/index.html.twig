@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Consumption Log{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-journal-text"></i> Consumption Log</h1>
+        <a href="{{ path('app_consumption_new') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Log Consumption
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Drug Name</th>
+                            <th>Category</th>
+                            <th>Quantity Used</th>
+                            <th>Logged By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for consumption in consumptions %}
+                        <tr>
+                            <td>{{ consumption.consumedAt|date('Y-m-d H:i:s') }}</td>
+                            <td><strong>{{ consumption.drug.name }}</strong></td>
+                            <td>{{ consumption.drug.category }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ consumption.quantity }}</span>
+                            </td>
+                            <td>{{ consumption.loggedBy }}</td>
+                            <td>
+                                <a href="{{ path('app_consumption_show', {'id': consumption.id}) }}" class="btn btn-sm btn-info">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox"></i> No consumption logs yet.
+                                <a href="{{ path('app_consumption_new') }}">Log your first consumption</a>.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

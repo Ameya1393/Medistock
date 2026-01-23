@@ -1,0 +1,201 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Consumption Prediction{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-graph-up-arrow"></i> Consumption Prediction</h1>
+        <a href="{{ path('app_dashboard') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-funnel"></i> Select Drug</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Drug</label>
+                    <select name="drug_id" class="form-select" required>
+                        <option value="">-- Select a Drug --</option>
+                        {% for drug in drugs %}
+                            <option value="{{ drug.id }}" {% if selectedDrug and selectedDrug.id == drug.id %}selected{% endif %}>
+                                {{ drug.name }} ({{ drug.category }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Days to Predict</label>
+                    <select name="days" class="form-select">
+                        <option value="7" {% if days == 7 %}selected{% endif %}>7 days</option>
+                        <option value="14" {% if days == 14 %}selected{% endif %}>14 days</option>
+                        <option value="30" {% if days == 30 %}selected{% endif %}>30 days</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Predict
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if selectedDrug %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-capsule"></i> {{ selectedDrug.name }} - Consumption Prediction
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="consumptionChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Prediction Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Predicted</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prediction in predictions %}
+                            <tr>
+                                <td>{{ prediction.date }}</td>
+                                <td><span class="badge bg-info">{{ prediction.predicted }}</span></td>
+                                <td>
+                                    <span class="badge {% if prediction.confidence == 'high' %}bg-success{% elseif prediction.confidence == 'medium' %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ prediction.confidence|upper }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Prediction Summary</h5>
+                </div>
+                <div class="card-body">
+                    {% if predictions|length > 0 %}
+                        {% set totalPredicted = predictions|reduce((sum, p) => sum + p.predicted, 0) %}
+                        {% set avgPredicted = totalPredicted / predictions|length %}
+                        <p><strong>Average Daily Consumption:</strong> <span class="badge bg-primary">{{ avgPredicted|round(2) }}</span></p>
+                        <p><strong>Total Predicted ({{ days }} days):</strong> <span class="badge bg-info">{{ totalPredicted }}</span></p>
+                        <p><strong>Current Stock:</strong> <span class="badge {% if selectedDrug.isLowStock() %}bg-danger{% else %}bg-success{% endif %}">{{ selectedDrug.stockQuantity }}</span></p>
+                        <p><strong>Threshold:</strong> <span class="badge bg-secondary">{{ selectedDrug.threshold }}</span></p>
+                        <hr>
+                        <p class="text-muted">
+                            <small>
+                                <i class="bi bi-info-circle"></i> Predictions are based on historical consumption patterns using moving average and trend analysis.
+                            </small>
+                        </p>
+                    {% else %}
+                        <p class="text-muted">No predictions available. Need more consumption data.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Please select a drug to view consumption predictions.
+    </div>
+    {% endif %}
+</div>
+
+{% if selectedDrug and predictions|length > 0 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const ctx = document.getElementById('consumptionChart').getContext('2d');
+    
+    const historicalData = {{ historical|json_encode|raw }};
+    const predictionData = {{ predictions|json_encode|raw }};
+    
+    const historicalLabels = historicalData.map(d => d.date);
+    const historicalValues = historicalData.map(d => d.quantity);
+    
+    const predictionLabels = predictionData.map(d => d.date);
+    const predictionValues = predictionData.map(d => d.predicted);
+    
+    const allLabels = [...historicalLabels, ...predictionLabels];
+    const allHistorical = [...historicalValues, ...Array(predictionLabels.length).fill(null)];
+    const allPredictions = [...Array(historicalLabels.length).fill(null), ...predictionValues];
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: allLabels,
+            datasets: [{
+                label: 'Historical Consumption',
+                data: allHistorical,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1,
+                spanGaps: true
+            }, {
+                label: 'Predicted Consumption',
+                data: allPredictions,
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderDash: [5, 5],
+                tension: 0.1,
+                spanGaps: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Consumption History and Prediction'
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Quantity'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}
+

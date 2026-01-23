@@ -1,0 +1,215 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - MediStock{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4">
+                <i class="bi bi-speedometer2"></i> MediStock Dashboard
+            </h1>
+            <p class="lead text-muted">Hospital Drug Inventory and Consumption Management System</p>
+        </div>
+    </div>
+
+    <!-- Drug Summary Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-capsule"></i> Drug Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <h3 class="text-primary">{{ totalDrugs }}</h3>
+                                <p class="text-muted mb-0">Total Drugs</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <h3 class="text-success">{{ totalStockItems }}</h3>
+                                <p class="text-muted mb-0">Total Stock Items</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <h3 class="text-warning">{{ lowStockCount }}</h3>
+                                <p class="text-muted mb-0">Low Stock Alerts</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Alerts Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Low Stock Alerts
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Drug Name</th>
+                                    <th>Category</th>
+                                    <th>Current Stock</th>
+                                    <th>Threshold</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if lowStockDrugs|length > 0 %}
+                                    {% for drug in lowStockDrugs %}
+                                    <tr>
+                                        <td><strong>{{ drug.name }}</strong></td>
+                                        <td>{{ drug.category }}</td>
+                                        <td>
+                                            <span class="badge bg-danger">{{ drug.stockQuantity }}</span>
+                                        </td>
+                                        <td>{{ drug.threshold }}</td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-exclamation-triangle"></i> Low Stock
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% if lowStockCount > 5 %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">
+                                            <a href="{{ path('app_alerts_index') }}" class="btn btn-sm btn-warning">
+                                                View All {{ lowStockCount }} Low Stock Items
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <i class="bi bi-check-circle text-success"></i> No low stock alerts at this time.
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Consumption Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i> Recent Consumption
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Drug Name</th>
+                                    <th>Quantity Used</th>
+                                    <th>Logged By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recentConsumptions|length > 0 %}
+                                    {% for consumption in recentConsumptions %}
+                                    <tr>
+                                        <td>{{ consumption.consumedAt|date('Y-m-d H:i:s') }}</td>
+                                        <td><strong>{{ consumption.drug.name }}</strong></td>
+                                        <td><span class="badge bg-info">{{ consumption.quantity }}</span></td>
+                                        <td>{{ consumption.loggedBy }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">
+                                            <a href="{{ path('app_consumption_index') }}" class="btn btn-sm btn-info">
+                                                View All Consumption Logs
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            <i class="bi bi-inbox"></i> No consumption logs yet.
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightning"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ path('app_drug_new') }}" class="btn btn-primary w-100">
+                                <i class="bi bi-plus-circle"></i> Add Drug
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ path('app_stock_index') }}" class="btn btn-success w-100">
+                                <i class="bi bi-box-arrow-in-down"></i> Update Stock
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ path('app_consumption_new') }}" class="btn btn-info w-100">
+                                <i class="bi bi-journal-text"></i> Log Consumption
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ path('app_reports_usage') }}" class="btn btn-warning w-100">
+                                <i class="bi bi-file-earmark-text"></i> View Reports
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ path('app_prediction_stockout') }}" class="btn btn-danger w-100">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Stockout Predictions
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ path('app_prediction_consumption') }}" class="btn btn-primary w-100">
+                                <i class="bi bi-graph-up-arrow"></i> Consumption Predictions
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

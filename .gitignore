@@ -1,0 +1,50 @@
+# Symfony & PHP
+/var/
+/vendor/
+/public/bundles/
+/public/build/
+
+# Environment & secrets
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/
+
+# Logs
+/var/log/
+*.log
+
+# Cache
+/var/cache/
+
+# Node / frontend
+/node_modules/
+/npm-debug.log
+/yarn-error.log
+
+# IDE / editor
+/.idea/
+/.vscode/
+/.phpunit.result.cache
+/.DS_Store
+
+# PHPUnit
+/phpunit.xml
+/phpunit.xml.dist
+/coverage/
+
+# Misc
+*.swp
+*.swo
+*.orig
+Thumbs.db
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###

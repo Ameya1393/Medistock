@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Consumption Details{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-journal-text"></i> Consumption Details</h1>
+        <a href="{{ path('app_consumption_index') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Log
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-borderless">
+                <tbody>
+                    <tr>
+                        <th class="w-25">ID</th>
+                        <td>{{ consumption.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Drug</th>
+                        <td>
+                            <strong>{{ consumption.drug.name }}</strong> 
+                            <span class="badge bg-secondary">{{ consumption.drug.category }}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Quantity Used</th>
+                        <td><span class="badge bg-info fs-6">{{ consumption.quantity }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Date & Time</th>
+                        <td>{{ consumption.consumedAt|date('Y-m-d H:i:s') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Logged By</th>
+                        <td>{{ consumption.loggedBy }}</td>
+                    </tr>
+                    {% if consumption.notes %}
+                    <tr>
+                        <th>Notes</th>
+                        <td>{{ consumption.notes }}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
