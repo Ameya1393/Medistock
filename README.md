@@ -41,7 +41,7 @@ MediStock helps hospitals track available drugs, monitor stock levels, log daily
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/medistock.git
+git clone https://github.com/Ameya1393/medistock.git
 cd medistock
 ```
 
