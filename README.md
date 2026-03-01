@@ -1,257 +1,235 @@
-## holoHC REDCap Datalake – Phase 1 Prototype
+# MediStock - Hospital Drug Inventory Management System
 
-This repository contains **Phase 1 of the REDCap → Datalake prototype**, focused on:
+A comprehensive web-based hospital drug inventory and consumption management system with AI/ML-powered predictions.
 
-- **Reliable data extraction** from the REDCap API  
-- **Immutable raw data preservation**  
-- **Normalized, analysis-ready tables**  
-- **Clear, reproducible pipeline steps**  
+## Project Overview
+
+MediStock helps hospitals track available drugs, monitor stock levels, log daily consumption, generate low-stock alerts, and provide intelligent predictions using machine learning algorithms.
+
+## Features
+
+### Core Features
+
+* **Drug Management**: Add, edit, delete, and view drugs
+* **Stock Management**: Track and update stock levels
+* **Consumption Logging**: Record drug usage with automatic stock deduction
+* **Alerts System**: Real-time low stock alerts
+* **Reports**: Low stock reports and usage analysis with filters
+* **Dashboard**: Central hub with statistics and quick actions
+* **PDF Reports**: Comprehensive analytics reports with explanations
+* **User Authentication**: Role-based access control (Admin/User)
+
+### AI/ML Features
+
+* **Consumption Prediction**: Time series forecasting for future drug consumption
+* **Stockout Prediction**: Predict when drugs will run out of stock
+* **Interactive Charts**: Visual representation of predictions using Chart.js
+
+## 🛠️ Technology Stack
+
+* **Backend**: Symfony 7.4 (PHP 8.2+)
+* **Database**: MySQL 8.0
+* **ORM**: Doctrine ORM
+* **Frontend**: Twig, Bootstrap 5.3, Chart.js
+* **ML Library**: PHP-ML (PHP Machine Learning)
+* **PDF Generation**: DomPDF
+* **Containerization**: Docker Compose
+
+## Prerequisites
+
+* PHP 8.2 or higher
+* Composer
+* Docker Desktop (for MySQL database)
+* MySQL Workbench (optional, for database management)
+
+## Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Ameya1393/medistock.git
+cd medistock
+```
+
+### 2. Install Dependencies
+
+```bash
+composer install
+```
+
+### 3. Database Setup
+
+#### Start Docker Database
+
+```bash
+docker compose up -d database
+```
+
+Wait for the database to be ready (~15-20 seconds).
+
+#### Run Migrations
+
+```bash
+php bin/console doctrine:migrations:migrate
+```
+
+### 4. Configure Environment
+
+The `.env` file is already configured with default database settings:
+
+* Database: `medistock`
+* Username: `medistock`
+* Password: `!ChangeMe!`
+* Host: `127.0.0.1:3306`
+
+**Important**: Change the password in production!
+
+### 5. Start the Server
+
+```bash
+symfony serve
+# OR
+php -S localhost:8000 -t public
+```
+
+### 6. Access the Application
+
+Open your browser and navigate to: `http://localhost:8000/`
+
+## Usage
+
+### Getting Started
+
+1. **Register/Login**: Create an account or login to access the system
+2. **Add Drugs**: Go to Drugs → Create new drug
+3. **Set Initial Stock**: When creating a drug, set the initial stock quantity
+4. **Log Consumption**: Go to Consumption → Log new consumption
+5. **Monitor Stock**: Check Stock page for current levels
+6. **View Alerts**: Check Alerts page for low stock warnings
+7. **View Predictions**: Use Predictions menu for AI-powered forecasts
+8. **Download Reports**: Generate comprehensive PDF analytics reports
+
+### Key Workflows
+
+**Adding a New Drug:**
+
+1. Navigate to Drugs → Create new
+2. Fill in: Name, Category, Threshold, Initial Stock Quantity
+3. Save
+
+**Logging Consumption:**
+
+1. Go to Consumption → Log Consumption
+2. Select drug, enter quantity used, date, and who logged it
+3. Stock automatically decreases
+
+**Updating Stock:**
+
+1. Go to Stock → Select drug → Update Stock
+2. Choose action: Increase, Decrease, or Set
+3. Enter quantity and save
+
+**Viewing Predictions:**
+
+1. Go to Predictions → Consumption Prediction
+2. Select a drug with consumption history
+3. View predicted consumption for next 7/14/30 days
+
+**Downloading Analytics Report:**
+
+1. Go to Dashboard or Reports page
+2. Click "Download Analytics Report (PDF)"
+3. Get comprehensive report with all analytics and explanations
+
+## Project Structure
+
+```
+medistock/
+├── config/              # Symfony configuration
+├── migrations/          # Database migrations
+├── public/              # Web root
+├── src/
+│   ├── Controller/      # HTTP controllers
+│   ├── Entity/          # Database entities
+│   ├── Form/            # Symfony forms
+│   ├── Repository/      # Data access layer
+│   └── Service/         # Business logic & ML services
+├── templates/           # Twig templates
+└── var/                 # Cache and logs
+```
+
+## AI/ML Features
+
+### Consumption Prediction
+
+* Uses Moving Average and Trend Analysis
+* Predicts future consumption for 7, 14, or 30 days
+* Provides confidence levels (High/Medium/Low)
+* Shows prediction bounds
+
+### Stockout Prediction
+
+* Projects when drugs will run out
+* Categorizes urgency (URGENT/WARNING/SAFE)
+* Estimates days until stockout
+* Provides confidence scores
+
+## 📊 Database Schema
+
+### Drug Table
+
+* `id`, `name`, `category`, `threshold`, `stock_quantity`, `created_at`
+
+### Consumption Table
+
+* `id`, `drug_id`, `quantity`, `consumed_at`, `logged_by`, `notes`
+
+### User Table
+
+* `id`, `email`, `password`, `full_name`, `roles`, `created_at`
+
+## Security Notes
+
+* CSRF protection enabled on all forms
+* SQL injection prevention via Doctrine ORM
+* XSS protection via Twig auto-escaping
+* Input validation on all forms
+* Password hashing using Symfony's password hasher
+* Role-based access control (ROLE_ADMIN, ROLE_USER)
+
+## 📝 Documentation
+
+* `PROJECT_SUMMARY.md` - Complete project documentation
+* `WEBSITE_FEATURES_COMPLETE.md` - Website features documentation
+* `AI_ML_FEATURES_COMPLETE.md` - AI/ML features documentation
+* `AUTHENTICATION_SETUP.md` - Authentication setup guide
+
+## 👥 Contributing
+
+This is an academic project. For collaboration:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📄 License
+
+This project is for academic purposes.
+
+## Authors
+
+* Ameya Dhurde
+* Karri Leena
+
+## Acknowledgments
+
+* Symfony Framework
+* PHP-ML Library
+* Chart.js
+* Bootstrap
+* DomPDF
 
 ---
 
-## 1. Overview
-
-Phase 1 establishes a deterministic, reproducible data pipeline that:
-
-- Extracts data from the REDCap API with retry handling  
-- Preserves immutable raw JSON exports  
-- Produces clean, normalized CSV tables for downstream analysis  
-
-The design follows a strict **RAW → PROCESSED** pattern:
-
-- **RAW layer**: exact exports from REDCap, stored as JSON with date-stamped filenames  
-- **PROCESSED layer**: normalized, analysis-ready CSV tables  
-
----
-
-## 2. Prerequisites
-
-You must have the following installed:
-
-- **Python 3.10+**
-- **pip**
-- Access to a **REDCap API token** for the target project
-
-Verify Python installation:
-
-```bash
-python --version
-```
-
----
-
-## 3. Repository Structure
-
-`holohc-datalake-prototype/`:
-
-```text
-holohc-datalake-prototype/
-├─ data/
-│  ├─ raw/
-│  │  └─ redcap/
-│  │     ├─ metadata_YYYYMMDD.json
-│  │     ├─ instruments_YYYYMMDD.json
-│  │     └─ records_YYYYMMDD.json
-│  └─ processed/
-│     ├─ patients.csv
-│     ├─ visits.csv
-│     ├─ labs.csv
-│     └─ behaviors.csv
-├─ scripts/
-│  ├─ extract_metadata.py
-│  ├─ extract_records.py
-│  ├─ normalize_patients.py
-│  ├─ normalize_visits_clean.py
-│  ├─ normalize_labs.py
-│  └─ normalize_behaviors.py
-└─ README.md
-```
-
----
-
-## 4. Install Dependencies
-
-From the project root:
-
-```bash
-pip install requests pandas
-```
-
-**(Optional) Using a virtual environment:**
-
-```bash
-python -m venv .venv
-
-# Linux / macOS
-source .venv/bin/activate
-
-# Windows
-.\.venv\Scripts\activate
-
-pip install requests pandas
-```
-
----
-
-## 5. Configure REDCap API Access
-
-Set your REDCap API token as an environment variable.
-
-**Windows (PowerShell):**
-
-```powershell
-setx REDCAP_API_TOKEN "your_api_token_here"
-```
-
-Restart the terminal after setting this.
-
-**Linux / macOS:**
-
-```bash
-export REDCAP_API_TOKEN="your_api_token_here"
-```
-
-For persistence, add this line to your shell profile.
-
----
-
-## 6. Raw Data Extraction (Source Layer)
-
-All raw REDCap exports are written to:
-
-- `data/raw/redcap/`
-
-Files are date-stamped using `YYYYMMDD`.
-
-### 6.1 Extract Metadata & Instruments
-
-```bash
-python scripts/extract_metadata.py
-```
-
-**Outputs:**
-
-- `data/raw/redcap/metadata_YYYYMMDD.json`  
-- `data/raw/redcap/instruments_YYYYMMDD.json`  
-
-These files preserve the REDCap project structure at the time of export.
-
-### 6.2 Extract Records
-
-```bash
-python scripts/extract_records.py
-```
-
-This step:
-
-- Calls the REDCap API to export records  
-- Implements retry logic for transient failures  
-- Handles unstable REDCap API responses  
-- Writes verbatim raw JSON without transformation  
-
-**Output:**
-
-- `data/raw/redcap/records_YYYYMMDD.json`
-
-**Important:**  
-The **RAW layer is append-only**. Do **not** edit or overwrite raw files. Generate a new dated export instead.
-
----
-
-## 7. Data Normalization (Processed Layer)
-
-Processed, analysis-ready tables are written to:
-
-- `data/processed/`
-
-Ensure the directory exists:
-
-```bash
-mkdir -p data/processed
-```
-
-### 7.1 Normalize Patients
-
-```bash
-python scripts/normalize_patients.py
-```
-
-**Output:**
-
-- `data/processed/patients.csv`
-
-**Description:**
-
-- One row per patient  
-- Core demographics and baseline attributes  
-
-### 7.2 Normalize Visits
-
-```bash
-python scripts/normalize_visits_clean.py
-```
-
-**Output:**
-
-- `data/processed/visits.csv`
-
-**Description:**
-
-- One row per patient per visit  
-- Visit dates, compliance, hospitalization, and mortality flags  
-
-### 7.3 Normalize Labs
-
-```bash
-python scripts/normalize_labs.py
-```
-
-**Output:**
-
-- `data/processed/labs.csv`
-
-**Schema (long format):**
-
-- `study_id`  
-- `visit`  
-- `lab_name`  
-- `value`  
-
-Each row represents a single lab measurement.
-
-### 7.4 Normalize Behaviors
-
-```bash
-python scripts/normalize_behaviors.py
-```
-
-**Output:**
-
-- `data/processed/behaviors.csv`
-
-**Description:**
-
-- Behavioral indicators normalized per patient per visit  
-
----
-
-## 8. Data Quality & Reliability Notes
-
-- The REDCap API may intermittently raise errors such as `ConnectionResetError (10054)`  
-- Extraction scripts include retry logic to mitigate transient failures  
-
-If failures persist:
-
-- Re-run the extraction script  
-- Keep existing raw files for traceability  
-
----
-
-## 9. Reproducibility Guidelines
-
-To reproduce a dataset snapshot:
-
-- Do not modify files under `data/raw/redcap/`  
-- Note the `YYYYMMDD` suffix of the raw exports  
-- Re-run normalization scripts to regenerate CSVs  
-- Commit processed outputs for versioned traceability
+For detailed project information, see `PROJECT_SUMMARY.md`
