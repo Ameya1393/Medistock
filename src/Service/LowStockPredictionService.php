@@ -32,6 +32,8 @@ class LowStockPredictionService
                 'daysUntilStockout' => 0,
                 'estimatedDate' => (new \DateTimeImmutable())->format('Y-m-d'),
                 'confidence' => 'high',
+                'isUrgent' => true,
+                'isWarning' => true,
                 'message' => 'Stock is already depleted',
             ];
         }
@@ -45,6 +47,8 @@ class LowStockPredictionService
                 'daysUntilStockout' => null,
                 'estimatedDate' => null,
                 'confidence' => 'low',
+                'isUrgent' => false,
+                'isWarning' => false,
                 'message' => 'Insufficient consumption data for prediction',
             ];
         }
@@ -78,6 +82,8 @@ class LowStockPredictionService
                 'daysUntilStockout' => null,
                 'estimatedDate' => null,
                 'confidence' => $confidence,
+                'isUrgent' => false,
+                'isWarning' => false,
                 'message' => 'Stock is predicted to last more than 90 days',
                 'remainingAfter90Days' => (int) $cumulativeStock,
             ];
@@ -128,4 +134,10 @@ class LowStockPredictionService
         return $predictions;
     }
 }
+
+
+
+
+
+
 

@@ -616,3 +616,12 @@ The integration of machine learning algorithms for consumption prediction and st
 
 *This project demonstrates proficiency in web development, database design, machine learning implementation, and software engineering best practices.*
 
+
+
+
+
+
+
+
+
+

@@ -10,8 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/predictions')]
+#[IsGranted('ROLE_ADMIN')]
 final class PredictionController extends AbstractController
 {
     #[Route('/consumption', name: 'app_prediction_consumption', methods: ['GET'])]
@@ -71,4 +73,12 @@ final class PredictionController extends AbstractController
         ]);
     }
 }
+
+
+
+
+
+
+
+
 

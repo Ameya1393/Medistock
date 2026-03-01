@@ -20,7 +20,8 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
+                    {% if app.user %}
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_dashboard') }}">
                                 <i class="bi bi-speedometer2"></i> Dashboard
@@ -32,13 +33,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_stock_index') }}">
-                                <i class="bi bi-box-seam"></i> Stock
+                            <a class="nav-link" href="{{ path('app_consumption_index') }}">
+                                <i class="bi bi-clipboard-data"></i> Consumption
                             </a>
                         </li>
+                        {% if is_granted('ROLE_ADMIN') %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_consumption_index') }}">
-                                <i class="bi bi-journal-text"></i> Consumption
+                            <a class="nav-link" href="{{ path('app_stock_index') }}">
+                                <i class="bi bi-box-seam"></i> Stock
                             </a>
                         </li>
                         <li class="nav-item">
@@ -51,29 +53,64 @@
                                 <i class="bi bi-file-earmark-text"></i> Reports
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_prediction_stockout') }}">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="predictionsDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-graph-up"></i> Predictions
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ path('app_prediction_consumption') }}">
+                                    <i class="bi bi-bar-chart"></i> Consumption Prediction
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ path('app_prediction_stockout') }}">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> Stockout Prediction
+                                </a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_user_index') }}">
+                                <i class="bi bi-people"></i> Users
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> {{ app.user.email }}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <span class="badge bg-warning text-dark ms-1">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-secondary ms-1">User</span>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">{{ app.user.fullName ?? app.user.email }}</h6></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ path('app_logout') }}">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    {% else %}
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_login') }}">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_register') }}">
+                                <i class="bi bi-person-plus"></i> Register
                             </a>
                         </li>
                     </ul>
+                    {% endif %}
                 </div>
             </div>
         </nav>
 
         <main class="container-fluid mt-4">
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle"></i> {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-            {% for message in app.flashes('error') %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-circle"></i> {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
             {% block body %}{% endblock %}
         </main>
 

@@ -2,67 +2,374 @@
 
 {% block title %}Dashboard - MediStock{% endblock %}
 
-{% block body %}
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="display-4">
-                <i class="bi bi-speedometer2"></i> MediStock Dashboard
-            </h1>
-            <p class="lead text-muted">Hospital Drug Inventory and Consumption Management System</p>
-        </div>
-    </div>
+{% block stylesheets %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .kpi-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 4px solid;
+        height: 100%;
+    }
+    
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .kpi-card.primary { border-left-color: #667eea; }
+    .kpi-card.success { border-left-color: #48bb78; }
+    .kpi-card.warning { border-left-color: #ed8936; }
+    .kpi-card.danger { border-left-color: #f56565; }
+    .kpi-card.info { border-left-color: #4299e1; }
+    
+    .kpi-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+    
+    .kpi-icon.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .kpi-icon.success { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; }
+    .kpi-icon.warning { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); color: white; }
+    .kpi-icon.danger { background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%); color: white; }
+    .kpi-icon.info { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; }
+    
+    .kpi-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        color: #2d3748;
+    }
+    
+    .kpi-label {
+        color: #718096;
+        font-size: 0.95rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .category-section {
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .category-section:last-child {
+        border-bottom: none;
+        margin-bottom: 1rem;
+    }
+    
+    .category-header {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        border-left: 5px solid #667eea;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .category-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0;
+    }
+    
+    .category-subtitle {
+        color: #718096;
+        font-size: 0.9rem;
+        margin: 0.25rem 0 0 0;
+    }
+    
+    .tile-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        height: 100%;
+        cursor: pointer;
+        display: block;
+        min-height: 140px;
+    }
+    
+    .tile-card, .tile-card:hover {
+        color: inherit;
+        text-decoration: none;
+    }
+    
+    .tile-card-wrapper {
+        height: 100%;
+    }
+    
+    .tile-card:hover {
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        transform: translateY(-3px);
+        border-color: #667eea;
+    }
+    
+    .tile-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .tile-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.25rem;
+    }
+    
+    .tile-subtitle {
+        font-size: 0.85rem;
+        color: #718096;
+    }
+    
+    .consumption-tile {
+        background: linear-gradient(135deg, #fef5e7 0%, #fdebd0 100%);
+        border-left: 4px solid #f39c12;
+    }
+    
+    .consumption-tile:hover {
+        background: linear-gradient(135deg, #fdebd0 0%, #fad7a0 100%);
+    }
+    
+    .quick-action-btn {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+        color: #2d3748;
+        height: 100%;
+    }
+    
+    .quick-action-btn:hover {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .quick-action-btn i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .table-modern {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        width: 100%;
+        min-height: 100%;
+    }
+    
+    .table-modern table {
+        margin-bottom: 0;
+    }
+    
+    .table-modern thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .table-modern thead th {
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .table-modern tbody td {
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
+    }
+    
+    .badge-modern {
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #a0aec0;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    /* Fix for responsive spacing */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 1.5rem 1rem;
+        }
+        
+        .kpi-card {
+            margin-bottom: 1rem;
+        }
+        
+        .category-section {
+            margin-bottom: 2rem;
+        }
+    }
+    
+    /* Ensure tiles don't break on small screens */
+    .tile-card {
+        min-height: 140px;
+    }
+    
+    /* Fix link colors */
+    .tile-card, .tile-card:visited, .tile-card:active {
+        color: #2d3748;
+    }
+    
+    /* Ensure proper text alignment in quick actions */
+    .quick-action-btn small {
+        display: block;
+        margin-top: 0.25rem;
+        opacity: 0.8;
+    }
+    
+    /* Section separators */
+    .section-divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+        margin: 2rem 0;
+    }
+    
+    /* Better tile grid alignment */
+    .tile-grid {
+        display: grid;
+        gap: 1rem;
+    }
+    
+    /* Ensure equal height tiles in row */
+    .row.equal-height {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .row.equal-height > [class*='col-'] {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .row.equal-height > [class*='col-'] > * {
+        flex: 1;
+    }
+</style>
+{% endblock %}
 
-    <!-- Drug Summary Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-capsule"></i> Drug Summary
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-md-4">
-                            <div class="p-3">
-                                <h3 class="text-primary">{{ totalDrugs }}</h3>
-                                <p class="text-muted mb-0">Total Drugs</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="p-3">
-                                <h3 class="text-success">{{ totalStockItems }}</h3>
-                                <p class="text-muted mb-0">Total Stock Items</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="p-3">
-                                <h3 class="text-warning">{{ lowStockCount }}</h3>
-                                <p class="text-muted mb-0">Low Stock Alerts</p>
-                            </div>
-                        </div>
+{% block body %}
+<div class="container-fluid px-3 px-md-4 py-4" style="background: #f7fafc; min-height: 100vh;">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header text-center mb-4">
+        <h1 class="display-5 mb-2">
+            <i class="bi bi-speedometer2"></i> MediStock Dashboard
+        </h1>
+        <p class="lead mb-0" style="opacity: 0.9;">Hospital Drug Inventory and Consumption Management System</p>
+        {% if is_granted('ROLE_ADMIN') %}
+        <div class="mt-3">
+            <a href="{{ path('app_reports_download_summary') }}" class="btn btn-light btn-lg" style="background: white; color: #667eea; border: 2px solid white; font-weight: 600; padding: 0.75rem 2rem;">
+                <i class="bi bi-download"></i> Download Analytics Report (PDF)
+            </a>
+        </div>
+        {% endif %}
+    </div>
+        <!-- KPI Cards Row -->
+        <div class="row g-3 g-md-4 mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card primary">
+                    <div class="kpi-icon primary">
+                        <i class="bi bi-capsule"></i>
                     </div>
+                    <div class="kpi-value text-primary">{{ totalDrugs }}</div>
+                    <div class="kpi-label">Total Drugs</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card success">
+                    <div class="kpi-icon success">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div class="kpi-value text-success">{{ totalStockItems }}</div>
+                    <div class="kpi-label">Total Stock Items</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card warning">
+                    <div class="kpi-icon warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="kpi-value text-warning">{{ lowStockCount }}</div>
+                    <div class="kpi-label">Low Stock Alerts</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="kpi-card info">
+                    <div class="kpi-icon info">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div class="kpi-value text-info">{{ recentConsumptions|length }}</div>
+                    <div class="kpi-label">Recent Logs</div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Low Stock Alerts Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">
-                        <i class="bi bi-exclamation-triangle"></i> Low Stock Alerts
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
+        {% if is_granted('ROLE_ADMIN') %}
+        <!-- Category: Inventory Management -->
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title">
+                    <i class="bi bi-box-seam"></i> Inventory Management
+                </h2>
+                <p class="category-subtitle">Monitor and manage your drug inventory</p>
+            </div>
+            
+            <div class="row g-3 g-md-4 mb-4 equal-height">
+                <!-- Low Stock Alerts Table -->
+                <div class="col-lg-8 col-md-12">
+                    <div class="table-modern">
+                        <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Drug Name</th>
+                                    <th><i class="bi bi-capsule"></i> Drug Name</th>
                                     <th>Category</th>
                                     <th>Current Stock</th>
                                     <th>Threshold</th>
@@ -74,13 +381,13 @@
                                     {% for drug in lowStockDrugs %}
                                     <tr>
                                         <td><strong>{{ drug.name }}</strong></td>
-                                        <td>{{ drug.category }}</td>
+                                        <td><span class="badge badge-modern bg-secondary">{{ drug.category }}</span></td>
                                         <td>
-                                            <span class="badge bg-danger">{{ drug.stockQuantity }}</span>
+                                            <span class="badge badge-modern bg-danger">{{ drug.stockQuantity }}</span>
                                         </td>
                                         <td>{{ drug.threshold }}</td>
                                         <td>
-                                            <span class="badge bg-warning text-dark">
+                                            <span class="badge badge-modern bg-warning text-dark">
                                                 <i class="bi bi-exclamation-triangle"></i> Low Stock
                                             </span>
                                         </td>
@@ -88,17 +395,18 @@
                                     {% endfor %}
                                     {% if lowStockCount > 5 %}
                                     <tr>
-                                        <td colspan="5" class="text-center">
-                                            <a href="{{ path('app_alerts_index') }}" class="btn btn-sm btn-warning">
-                                                View All {{ lowStockCount }} Low Stock Items
+                                        <td colspan="5" class="text-center py-3">
+                                            <a href="{{ path('app_alerts_index') }}" class="btn btn-warning btn-sm">
+                                                <i class="bi bi-arrow-right"></i> View All {{ lowStockCount }} Low Stock Items
                                             </a>
                                         </td>
                                     </tr>
                                     {% endif %}
                                 {% else %}
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted py-4">
-                                            <i class="bi bi-check-circle text-success"></i> No low stock alerts at this time.
+                                        <td colspan="5" class="empty-state">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            <p class="mb-0 mt-2">No low stock alerts at this time.</p>
                                         </td>
                                     </tr>
                                 {% endif %}
@@ -106,25 +414,106 @@
                         </table>
                     </div>
                 </div>
+                
+                <!-- Inventory Quick Actions Tiles -->
+                <div class="col-lg-4 col-md-12">
+                    <div class="row g-3 h-100">
+                        <div class="col-12">
+                            <a href="{{ path('app_drug_index') }}" class="tile-card text-decoration-none tile-card-wrapper">
+                                <div class="tile-icon bg-primary text-white">
+                                    <i class="bi bi-capsule"></i>
+                                </div>
+                                <div class="tile-title">View All Drugs</div>
+                                <div class="tile-subtitle">Browse complete drug catalog</div>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="{{ path('app_stock_index') }}" class="tile-card text-decoration-none tile-card-wrapper">
+                                <div class="tile-icon bg-success text-white">
+                                    <i class="bi bi-box-arrow-in-down"></i>
+                                </div>
+                                <div class="tile-title">Update Stock</div>
+                                <div class="tile-subtitle">Manage inventory levels</div>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="{{ path('app_alerts_index') }}" class="tile-card text-decoration-none tile-card-wrapper">
+                                <div class="tile-icon bg-warning text-white">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <div class="tile-title">View All Alerts</div>
+                                <div class="tile-subtitle">Check all low stock items</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+        {% endif %}
 
-    <!-- Recent Consumption Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-clock-history"></i> Recent Consumption
-                    </h5>
+        <!-- Category: Drug Consumption -->
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title">
+                    <i class="bi bi-clipboard-data"></i> Drug Consumption
+                </h2>
+                <p class="category-subtitle">Track and analyze drug usage patterns</p>
+            </div>
+            
+            <div class="row g-3 g-md-4 mb-4 equal-height">
+                <!-- Consumption Tiles -->
+                <div class="col-lg-4 col-md-12">
+                    <div class="row g-3 h-100">
+                        <div class="col-12">
+                            <a href="{{ path('app_consumption_new') }}" class="consumption-tile tile-card text-decoration-none tile-card-wrapper">
+                                <div class="tile-icon bg-warning text-white">
+                                    <i class="bi bi-journal-plus"></i>
+                                </div>
+                                <div class="tile-title">Log New Consumption</div>
+                                <div class="tile-subtitle">Record drug usage</div>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="{{ path('app_consumption_index') }}" class="tile-card text-decoration-none tile-card-wrapper">
+                                <div class="tile-icon bg-info text-white">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                                <div class="tile-title">View All Logs</div>
+                                <div class="tile-subtitle">Complete consumption history</div>
+                            </a>
+                        </div>
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <div class="col-12">
+                            <a href="{{ path('app_reports_usage') }}" class="tile-card text-decoration-none tile-card-wrapper">
+                                <div class="tile-icon bg-primary text-white">
+                                    <i class="bi bi-file-earmark-bar-graph"></i>
+                                </div>
+                                <div class="tile-title">Usage Reports</div>
+                                <div class="tile-subtitle">Analyze consumption data</div>
+                            </a>
+                        </div>
+                        {% else %}
+                        <!-- Fill empty space for non-admin users -->
+                        <div class="col-12">
+                            <div class="tile-card" style="opacity: 0.6; cursor: default;">
+                                <div class="tile-icon bg-secondary text-white">
+                                    <i class="bi bi-lock"></i>
+                                </div>
+                                <div class="tile-title">Reports</div>
+                                <div class="tile-subtitle">Admin access required</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
+                
+                <!-- Recent Consumption Table -->
+                <div class="col-lg-8 col-md-12">
+                    <div class="table-modern">
+                        <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
+                                    <th><i class="bi bi-calendar"></i> Date & Time</th>
                                     <th>Drug Name</th>
                                     <th>Quantity Used</th>
                                     <th>Logged By</th>
@@ -134,23 +523,26 @@
                                 {% if recentConsumptions|length > 0 %}
                                     {% for consumption in recentConsumptions %}
                                     <tr>
-                                        <td>{{ consumption.consumedAt|date('Y-m-d H:i:s') }}</td>
+                                        <td><small>{{ consumption.consumedAt|date('Y-m-d H:i') }}</small></td>
                                         <td><strong>{{ consumption.drug.name }}</strong></td>
-                                        <td><span class="badge bg-info">{{ consumption.quantity }}</span></td>
-                                        <td>{{ consumption.loggedBy }}</td>
+                                        <td>
+                                            <span class="badge badge-modern bg-info">{{ consumption.quantity }}</span>
+                                        </td>
+                                        <td><small>{{ consumption.loggedBy }}</small></td>
                                     </tr>
                                     {% endfor %}
                                     <tr>
-                                        <td colspan="4" class="text-center">
-                                            <a href="{{ path('app_consumption_index') }}" class="btn btn-sm btn-info">
-                                                View All Consumption Logs
+                                        <td colspan="4" class="text-center py-3">
+                                            <a href="{{ path('app_consumption_index') }}" class="btn btn-info btn-sm">
+                                                <i class="bi bi-arrow-right"></i> View All Consumption Logs
                                             </a>
                                         </td>
                                     </tr>
                                 {% else %}
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted py-4">
-                                            <i class="bi bi-inbox"></i> No consumption logs yet.
+                                        <td colspan="4" class="empty-state">
+                                            <i class="bi bi-inbox"></i>
+                                            <p class="mb-0 mt-2">No consumption logs yet.</p>
                                         </td>
                                     </tr>
                                 {% endif %}
@@ -160,53 +552,100 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Quick Actions -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-lightning"></i> Quick Actions
-                    </h5>
+        <!-- Category: AI/ML Predictions -->
+        {% if is_granted('ROLE_ADMIN') %}
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title">
+                    <i class="bi bi-graph-up"></i> AI/ML Predictions
+                </h2>
+                <p class="category-subtitle">Intelligent forecasting and stockout predictions</p>
+            </div>
+            
+            <div class="row g-3 g-md-4 mb-4">
+                <div class="col-lg-6 col-md-12">
+                    <a href="{{ path('app_prediction_consumption') }}" class="tile-card text-decoration-none">
+                        <div class="tile-icon bg-primary text-white">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <div class="tile-title">Consumption Prediction</div>
+                        <div class="tile-subtitle">Forecast future drug consumption using time series analysis</div>
+                    </a>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ path('app_drug_new') }}" class="btn btn-primary w-100">
-                                <i class="bi bi-plus-circle"></i> Add Drug
-                            </a>
+                <div class="col-lg-6">
+                    <a href="{{ path('app_prediction_stockout') }}" class="tile-card text-decoration-none">
+                        <div class="tile-icon bg-danger text-white">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ path('app_stock_index') }}" class="btn btn-success w-100">
-                                <i class="bi bi-box-arrow-in-down"></i> Update Stock
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ path('app_consumption_new') }}" class="btn btn-info w-100">
-                                <i class="bi bi-journal-text"></i> Log Consumption
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ path('app_reports_usage') }}" class="btn btn-warning w-100">
-                                <i class="bi bi-file-earmark-text"></i> View Reports
-                            </a>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-md-6 mb-3">
-                            <a href="{{ path('app_prediction_stockout') }}" class="btn btn-danger w-100">
-                                <i class="bi bi-exclamation-triangle-fill"></i> Stockout Predictions
-                            </a>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <a href="{{ path('app_prediction_consumption') }}" class="btn btn-primary w-100">
-                                <i class="bi bi-graph-up-arrow"></i> Consumption Predictions
-                            </a>
-                        </div>
+                        <div class="tile-title">Stockout Prediction</div>
+                        <div class="tile-subtitle">Predict when drugs will run out of stock</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- AI/ML Predictions - Hidden for non-admin -->
+        {% endif %}
+
+        <!-- Category: Quick Actions -->
+        <div class="category-section">
+            <div class="category-header">
+                <h2 class="category-title">
+                    <i class="bi bi-lightning-charge"></i> Quick Actions
+                </h2>
+                <p class="category-subtitle">Frequently used operations</p>
+            </div>
+            
+            <div class="row g-3 g-md-4">
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <a href="{{ path('app_drug_new') }}" class="quick-action-btn">
+                        <i class="bi bi-plus-circle-fill text-primary"></i>
+                        <div class="fw-bold">Add Drug</div>
+                        <small>Create new drug entry</small>
+                    </a>
+                </div>
+                {% if is_granted('ROLE_ADMIN') %}
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <a href="{{ path('app_stock_index') }}" class="quick-action-btn">
+                        <i class="bi bi-box-arrow-in-down text-success"></i>
+                        <div class="fw-bold">Update Stock</div>
+                        <small>Adjust inventory levels</small>
+                    </a>
+                </div>
+                {% else %}
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="quick-action-btn" style="opacity: 0.5; cursor: not-allowed;">
+                        <i class="bi bi-lock text-secondary"></i>
+                        <div class="fw-bold">Update Stock</div>
+                        <small>Admin access required</small>
                     </div>
                 </div>
+                {% endif %}
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <a href="{{ path('app_consumption_new') }}" class="quick-action-btn">
+                        <i class="bi bi-journal-text text-info"></i>
+                        <div class="fw-bold">Log Consumption</div>
+                        <small>Record drug usage</small>
+                    </a>
+                </div>
+                {% if is_granted('ROLE_ADMIN') %}
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <a href="{{ path('app_reports_usage') }}" class="quick-action-btn">
+                        <i class="bi bi-file-earmark-text text-warning"></i>
+                        <div class="fw-bold">View Reports</div>
+                        <small>Generate analytics</small>
+                    </a>
+                </div>
+                {% else %}
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="quick-action-btn" style="opacity: 0.5; cursor: not-allowed;">
+                        <i class="bi bi-lock text-secondary"></i>
+                        <div class="fw-bold">View Reports</div>
+                        <small>Admin access required</small>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

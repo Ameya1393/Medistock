@@ -1,0 +1,400 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Calibri;}}
+\fs24
+\pard\qc\b Study Project \u8211? Phase 2 Document (Design \& Proof of Concept)\b0\par
+\par
+\pard\qc\b Cover Page\b0\par
+\par
+\pard\b Course Title:\b0  B.Sc. (CS) \u8211? Software Development Project (Phase 2)\par
+\pard\b Project Title:\b0  MediStock: Intelligent Medicine Inventory Management with Forecasting, Alerts, and IoT Integration\par
+\pard\b Group Number:\b0  57\par
+\pard\b Student Name(s):\b0  Ameya Dhurde; Karri Leena\par
+\pard\b Student ID(s):\b0  2023EBCS392; 2023EBCS343\par
+\pard\b Project Advisor / Supervisor:\b0  Vidyapati Kumar\par
+\pard\b Date of Submission:\b0  16-Feb-2026\par
+\par
+\pard\b Repository / PoC Reference (optional):\b0  <<ADD LINK IF APPLICABLE>>\par
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 1. Introduction\b0\par
+\par
+\pard\b 1.1 Purpose of Phase 2\b0\par
+\pard
+The purpose of Phase 2 is to translate the Phase 1 problem definition into a concrete system design and a demonstrable Proof of Concept (PoC). For MediStock (Intelligent Medicine Inventory Management with Forecasting, Alerts, and IoT Integration), Phase 2 focuses on:\par
+\pard\li720
+\pard\li720\bullet \tx720 Translating the inventory and consumption-tracking problem into a complete web-system design (modules, workflows, data model).\par
+\pard\li720\bullet \tx720 Defining functional and non-functional requirements to ensure correctness, usability, and operational readiness.\par
+\pard\li720\bullet \tx720 Designing the architecture (MVC, services, database) and validating feasibility through an implemented PoC.\par
+\pard\li0
+\par
+\pard\b 1.2 Scope of Phase 2\b0\par
+\pard
+Phase 2 includes:\par
+\pard\li720
+\pard\li720\bullet \tx720 System design and architecture (MVC, service-layer, database, UI views).\par
+\pard\li720\bullet \tx720 Detailed functional and non-functional requirements.\par
+\pard\li720\bullet \tx720 High-level database design and data-flow design for core workflows.\par
+\pard\li720\bullet \tx720 A working PoC demonstrating end-to-end modules: Drug, Stock, Consumption, Alerts, Reports, and AI/ML Predictions.\par
+\pard\li0
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 2. System Overview\b0\par
+\par
+\pard\b 2.1 Product Perspective\b0\par
+\pard
+MediStock is a standalone web-based hospital inventory and consumption management system. It can be deployed in a hospital intranet environment and can be integrated in the future with procurement/supplier systems.\par
+\par
+High-level interactions:\par
+\pard\li720
+\pard\li720\bullet \tx720 Users interact via a web browser UI (Bootstrap/Twig pages).\par
+\pard\li720\bullet \tx720 The Symfony backend processes requests, applies business rules, and reads/writes to the MySQL database via Doctrine ORM.\par
+\pard\li720\bullet \tx720 Prediction services analyze consumption history and generate consumption forecasts and stockout timelines.\par
+\pard\li0
+\par
+Deployment environment:\par
+\pard\li720
+\pard\li720\bullet \tx720 Web application (server-side rendered) running on PHP/Symfony.\par
+\pard\li720\bullet \tx720 MySQL database (Docker container for development; production can use managed MySQL).\par
+\pard\li0
+\par
+\pard\b 2.2 Major System Functions\b0\par
+\pard
+Key system functionalities include:\par
+\pard\li720
+\pard\li720\bullet \tx720 Drug catalog management (Create/Read/Update/Delete).\par
+\pard\li720\bullet \tx720 Stock management (increase, decrease, set stock; prevent negative stock).\par
+\pard\li720\bullet \tx720 Consumption logging (record usage; automatically deduct stock).\par
+\pard\li720\bullet \tx720 Low-stock alerts (threshold-based).\par
+\pard\li720\bullet \tx720 Reports (low-stock report and consumption usage report with filters).\par
+\pard\li720\bullet \tx720 AI/ML predictions: consumption prediction and stockout prediction with confidence/urgency.\par
+\pard\li0
+\par
+\pard\b 2.3 User Classes and Characteristics\b0\par
+\pard
+Primary user roles (authentication is a future enhancement; PoC assumes trusted internal users):\par
+\pard\li720
+\pard\li720\bullet \tx720 Pharmacy Staff: logs consumption, updates stock, responds to alerts.\par
+\pard\li720\bullet \tx720 Hospital Administrator / Inventory Manager: monitors stock, views reports, uses predictions for procurement planning.\par
+\pard\li720\bullet \tx720 System Administrator (future): manages users/roles and configuration.\par
+\pard\li0
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 3. Functional Requirements\b0\par
+\par
+\pard
+The functional requirements (FR) are listed below.\par
+\par
+\pard\b Drug Management\b0\par
+\pard
+FR1: The system shall allow users to create a new drug with name, category, threshold, and initial stock quantity.\par
+FR2: The system shall display a list of all drugs with current stock, threshold, and low-stock status.\par
+FR3: The system shall allow users to view complete drug details.\par
+FR4: The system shall allow users to edit drug details including threshold and stock quantity.\par
+FR5: The system shall allow users to delete a drug with CSRF protection.\par
+\par
+\pard\b Stock Management\b0\par
+\pard
+FR6: The system shall provide a stock overview page listing all drugs and their stock levels.\par
+FR7: The system shall allow users to increase stock by a given quantity.\par
+FR8: The system shall allow users to decrease stock by a given quantity.\par
+FR9: The system shall allow users to set the exact stock quantity.\par
+FR10: The system shall prevent stock quantity from becoming negative.\par
+\par
+\pard\b Consumption Logging\b0\par
+\pard
+FR11: The system shall allow users to record drug consumption including drug, quantity, date/time, logged-by, and optional notes.\par
+FR12: The system shall automatically deduct stock quantity when consumption is logged.\par
+FR13: The system shall prevent logging consumption that would cause negative stock.\par
+FR14: The system shall provide a consumption history page and allow viewing a single consumption record in detail.\par
+\par
+\pard\b Alerts and Reports\b0\par
+\pard
+FR15: The system shall detect low-stock drugs based on threshold and show them on an alerts page.\par
+FR16: The system shall provide a low-stock report with shortage amounts.\par
+FR17: The system shall provide a usage report with filtering by drug and date range.\par
+FR18: The system shall provide summary metrics (totals/averages) for the usage report.\par
+\par
+\pard\b Dashboard\b0\par
+\pard
+FR19: The system shall provide a dashboard with total drugs, total stock items, and low-stock counts.\par
+FR20: The system shall display recent consumption and top low-stock items on the dashboard.\par
+FR21: The system shall provide quick-action navigation to common workflows (add drug, update stock, log consumption, view reports, predictions).\par
+\par
+\pard\b AI/ML Predictions\b0\par
+\pard
+FR22: The system shall generate consumption predictions for a selected drug for user-selected horizons (e.g., 7/14/30 days).\par
+FR23: The system shall provide confidence levels (high/medium/low) for consumption predictions based on data consistency.\par
+FR24: The system shall generate stockout predictions for all drugs and classify urgency (URGENT/WARNING/PREDICTED/SAFE).\par
+FR25: The system shall provide a detailed prediction view for a selected drug including estimated stockout date and days remaining.\par
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 4. Non-Functional Requirements\b0\par
+\par
+\pard\b 4.1 Performance Requirements\b0\par
+\pard\li720
+\pard\li720\bullet \tx720 The system should load standard list pages (drugs/stock/consumption) within 2 seconds under normal local/intranet usage.\par
+\pard\li720\bullet \tx720 Reports and prediction generation should complete within 5 seconds for typical dataset sizes (hundreds to thousands of consumption rows).\par
+\pard\li0
+\par
+\pard\b 4.2 Security Requirements\b0\par
+\pard\li720
+\pard\li720\bullet \tx720 The system shall protect state-changing forms using CSRF tokens.\par
+\pard\li720\bullet \tx720 The system shall prevent SQL injection using ORM parameterized queries.\par
+\pard\li720\bullet \tx720 The system shall mitigate XSS via template auto-escaping and input validation.\par
+\pard\li720\bullet \tx720 (Future) The system shall implement authentication and role-based authorization for Admin/Staff roles.\par
+\pard\li0
+\par
+\pard\b 4.3 Usability Requirements\b0\par
+\pard\li720
+\pard\li720\bullet \tx720 The UI shall be responsive for desktop and mobile devices.\par
+\pard\li720\bullet \tx720 The system shall provide clear navigation (navbar + breadcrumbs) and visual status indicators (badges/colors) for stock state.\par
+\pard\li720\bullet \tx720 The system shall provide feedback for actions via flash messages (success/error).\par
+\pard\li0
+\par
+\pard\b 4.4 Scalability and Maintainability\b0\par
+\pard\li720
+\pard\li720\bullet \tx720 The codebase shall follow modular MVC with separate controllers, forms, services, and templates.\par
+\pard\li720\bullet \tx720 Business logic (including ML prediction logic) shall be encapsulated in services to allow future extensions.\par
+\pard\li720\bullet \tx720 Database changes shall be managed via migrations to support controlled evolution.\par
+\pard\li0
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 5. System Architecture and Design\b0\par
+\par
+\pard\b 5.1 System Architecture Diagram\b0\par
+\pard
+(High-level architecture diagram)\par
+\par
+\pard\li720
+[Web Browser]\par
+    |\par
+    v\par
+[Twig/Bootstrap UI Templates]\par
+    |\par
+    v\par
+[Symfony Controllers]\par
+    |\par
+    v\par
+[Service Layer: Stock Logic, Prediction Services]\par
+    |\par
+    v\par
+[Doctrine ORM / Repositories]\par
+    |\par
+    v\par
+[MySQL Database]\par
+\pard\li0
+\par
+External libraries:\par
+\pard\li720
+\pard\li720\bullet \tx720 Chart.js for visualization on prediction pages.\par
+\pard\li720\bullet \tx720 PHP-ML library (dependency) used for ML-related computations where applicable.\par
+\pard\li0
+\par
+\pard\b 5.2 Module-wise Design\b0\par
+\pard
+Module 1: Drug Management\par
+\pard\li720
+\pard\li720\bullet \tx720 Responsibilities: CRUD for drugs, manage threshold and baseline information.\par
+\pard\li720\bullet \tx720 Inputs: drug details from forms.\par
+\pard\li720\bullet \tx720 Outputs: persisted Drug records; views for list/detail.\par
+\pard\li0
+\par
+Module 2: Stock Management\par
+\pard\li720
+\pard\li720\bullet \tx720 Responsibilities: adjust stock (increase/decrease/set) and enforce non-negative stock.\par
+\pard\li720\bullet \tx720 Inputs: stock adjustment action + quantity.\par
+\pard\li720\bullet \tx720 Outputs: updated Drug stockQuantity; user feedback messages.\par
+\pard\li0
+\par
+Module 3: Consumption Logging\par
+\pard\li720
+\pard\li720\bullet \tx720 Responsibilities: capture consumption events; deduct stock; maintain audit-like history.\par
+\pard\li720\bullet \tx720 Inputs: selected drug, quantity, consumedAt, loggedBy, notes.\par
+\pard\li720\bullet \tx720 Outputs: persisted Consumption record; updated stock.\par
+\pard\li0
+\par
+Module 4: Alerts\par
+\pard\li720
+\pard\li720\bullet \tx720 Responsibilities: compute low-stock list and summaries.\par
+\pard\li720\bullet \tx720 Inputs: Drug inventory state.\par
+\pard\li720\bullet \tx720 Outputs: low-stock view and recommended actions.\par
+\pard\li0
+\par
+Module 5: Reports\par
+\pard\li720
+\pard\li720\bullet \tx720 Responsibilities: generate low-stock and usage analytics with filters.\par
+\pard\li720\bullet \tx720 Inputs: optional drug filter and date-range filter.\par
+\pard\li720\bullet \tx720 Outputs: aggregated metrics and detailed tables.\par
+\pard\li0
+\par
+Module 6: Predictions (AI/ML)\par
+\pard\li720
+\pard\li720\bullet \tx720 Responsibilities: predict consumption and stockout dates; provide confidence and urgency classification.\par
+\pard\li720\bullet \tx720 Inputs: consumption history and current stock.\par
+\pard\li720\bullet \tx720 Outputs: prediction tables, charts, and actionable indicators.\par
+\pard\li0
+\par
+\pard\b 5.3 Data Flow Design\b0\par
+\pard
+Key data flows:\par
+\pard\li720
+\pard\li720\bullet \tx720 Add Drug: UI Form \u8594? Controller \u8594? Doctrine ORM \u8594? Database \u8594? Drug List/Detail.\par
+\pard\li720\bullet \tx720 Log Consumption: UI Form \u8594? Controller (validate) \u8594? Create Consumption \u8594? Update Drug stock \u8594? Database \u8594? Dashboard/Reports.\par
+\pard\li720\bullet \tx720 Alerts: Controller queries drugs \u8594? apply threshold logic \u8594? Alerts view.\par
+\pard\li720\bullet \tx720 Predictions: Controller fetches consumption history \u8594? Prediction Service \u8594? results to template \u8594? charts/tables.\par
+\pard\li0
+\par
+\pard\b 5.4 Database Design (If Applicable)\b0\par
+\pard
+High-level ER relationship:\par
+\pard\li720
+Drug (1) \u8594? (Many) Consumption\par
+\pard\li0
+\par
+Key entities and attributes:\par
+\pard\li720
+\pard\li720\bullet \tx720 Drug: id, name, category, threshold, stockQuantity, createdAt.\par
+\pard\li720\bullet \tx720 Consumption: id, drug (FK), quantity, consumedAt, loggedBy, notes.\par
+\pard\li0
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 6. Technology Stack and Justification\b0\par
+\par
+\pard\b Frontend:\b0\par
+\pard\li720
+\pard\li720\bullet \tx720 Twig: server-side templating integrated with Symfony; fast development.\par
+\pard\li720\bullet \tx720 Bootstrap 5: responsive UI components and consistent styling.\par
+\pard\li720\bullet \tx720 Chart.js: simple, effective charts for predictions and analytics.\par
+\pard\li0
+\par
+\pard\b Backend:\b0\par
+\pard\li720
+\pard\li720\bullet \tx720 Symfony 7.x (PHP 8.3): robust MVC framework, routing, DI, forms, validation.\par
+\pard\li720\bullet \tx720 Doctrine ORM: secure database access, migrations, entity mapping.\par
+\pard\li0
+\par
+\pard\b Database:\b0\par
+\pard\li720
+\pard\li720\bullet \tx720 MySQL 8: widely adopted relational DB; supports transactional integrity.\par
+\pard\li0
+\par
+\pard\b Other Tools / Frameworks:\b0\par
+\pard\li720
+\pard\li720\bullet \tx720 Docker Compose: repeatable local DB environment for the PoC.\par
+\pard\li720\bullet \tx720 PHP-ML: ML-related utilities and future extensibility for advanced models.\par
+\pard\li0
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 7. Proof of Concept (PoC)\b0\par
+\par
+\pard\b 7.1 PoC Description\b0\par
+\pard
+The PoC for Phase 2 is a working web application that demonstrates:\par
+\pard\li720
+\pard\li720\bullet \tx720 End-to-end drug inventory workflows (CRUD, stock updates).\par
+\pard\li720\bullet \tx720 Consumption logging with automatic stock deduction.\par
+\pard\li720\bullet \tx720 Low-stock alerts and reporting.\par
+\pard\li720\bullet \tx720 AI/ML prediction pages for consumption forecasting and stockout predictions.\par
+\pard\li0
+\par
+This validates feasibility by showing that the system can store real consumption history, enforce stock integrity rules, and generate actionable predictions based on historical data.\par
+\par
+\pard\b 7.2 PoC Demonstration Details\b0\par
+\pard
+Demonstrated features:\par
+\pard\li720
+\pard\li720\bullet \tx720 Dashboard: KPIs, top alerts, recent consumption, quick actions.\par
+\pard\li720\bullet \tx720 Drugs: create/list/view/edit/delete.\par
+\pard\li720\bullet \tx720 Stock: increase/decrease/set stock with safeguards.\par
+\pard\li720\bullet \tx720 Consumption: create logs and view history.\par
+\pard\li720\bullet \tx720 Alerts/Reports: low-stock list, low-stock report, usage report with filters.\par
+\pard\li720\bullet \tx720 Predictions: consumption prediction chart/table, stockout urgency classification.\par
+\pard\li0
+\par
+Evidence to attach (to be provided by the group):\par
+\pard\li720
+\pard\li720\bullet \tx720 Screenshots of main pages (Dashboard, Stock, Alerts, Reports, Predictions).\par
+\pard\li720\bullet \tx720 (Optional) A short demo video or live demo link.\par
+\pard\li0
+\par
+Current limitations:\par
+\pard\li720
+\pard\li720\bullet \tx720 Authentication/authorization is not implemented in the PoC (assumes trusted users).\par
+\pard\li720\bullet \tx720 Predictions are statistical/heuristic (moving average + trend) and can be improved with more advanced models.\par
+\pard\li0
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 8. Testing and Validation Strategy\b0\par
+\par
+\pard
+Testing and validation approach for the PoC:\par
+\pard\li720
+\pard\li720\bullet \tx720 Unit testing (recommended): services for prediction logic (moving average, trend, confidence scoring), and stock adjustment rules.\par
+\pard\li720\bullet \tx720 Integration testing: controller workflows for consumption logging and automatic stock deduction.\par
+\pard\li720\bullet \tx720 Manual testing: end-to-end scenario testing across all modules; form validation checks; negative stock prevention; report filter validation.\par
+\pard\li0
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 9. Risks, Challenges, and Mitigation\b0\par
+\par
+\pard\b Identified Risks\b0\par
+\pard\li720
+\pard\li720\bullet \tx720 Technical complexity: ensuring consistent stock integrity while logging consumption and editing inventory.\par
+\pard\li720\bullet \tx720 Data quality: predictions depend on sufficient and consistent consumption history.\par
+\pard\li720\bullet \tx720 Usability: risk of user errors in stock updates and consumption logging.\par
+\pard\li720\bullet \tx720 Deployment constraints: dependency on Docker/MySQL setup for PoC environments.\par
+\pard\li0
+\par
+\pard\b Mitigation Strategies\b0\par
+\pard\li720
+\pard\li720\bullet \tx720 Enforce validation rules (no negative stock) and clear UI feedback (flash messages).\par
+\pard\li720\bullet \tx720 Provide confidence levels and bounds to communicate prediction uncertainty.\par
+\pard\li720\bullet \tx720 Use Bootstrap UI patterns and clear forms to reduce input mistakes.\par
+\pard\li720\bullet \tx720 Document setup steps and provide troubleshooting guide for database startup.\par
+\pard\li0
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 10. Phase 2 Outcomes and Readiness for Phase 3\b0\par
+\par
+\pard
+Phase 2 outcomes:\par
+\pard\li720
+\pard\li720\bullet \tx720 Completed system design aligned with modular MVC architecture.\par
+\pard\li720\bullet \tx720 Implemented a working PoC covering all major modules and user workflows.\par
+\pard\li720\bullet \tx720 Implemented AI/ML prediction services and UI visualization for decision support.\par
+\pard\li0
+\par
+Readiness for Phase 3:\par
+\pard\li720
+\pard\li720\bullet \tx720 The system is ready for refinement and production-hardening: authentication, role-based access, audit logs, and improved ML models.\par
+\pard\li720\bullet \tx720 Phase 3 can focus on deployment planning, security hardening, advanced analytics, and integrations (supplier/procurement).\par
+\pard\li0
+\par
+\pard\qc ________________________________________\par
+\par
+\pard\b 11. Supervisor Review and Approval\b0\par
+\par
+\pard\b Advisor Feedback:\b0\par
+\pard <<TO BE FILLED BY SUPERVISOR>>\par
+\par
+\pard\b Supervisor Comments:\b0\par
+\pard <<TO BE FILLED BY SUPERVISOR>>\par
+\par
+\pard\b Recommendations:\b0\par
+\pard <<TO BE FILLED BY SUPERVISOR>>\par
+\par
+\pard\b Signature:\b0  ___________________________\par
+\pard\b Date:\b0  _______________________________\par
+}
+
+

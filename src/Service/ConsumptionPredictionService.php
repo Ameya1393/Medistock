@@ -189,3 +189,12 @@ class ConsumptionPredictionService
     }
 }
 
+
+
+
+
+
+
+
+
+

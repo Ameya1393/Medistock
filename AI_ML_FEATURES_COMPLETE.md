@@ -211,3 +211,12 @@ All AI/ML prediction features for MediStock have been successfully implemented! 
 2. Add more consumption logs for better predictions
 3. Review and refine prediction algorithms based on results
 
+
+
+
+
+
+
+
+
+

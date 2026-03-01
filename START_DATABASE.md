@@ -52,3 +52,12 @@ If Docker Desktop won't start:
 - Try restarting Docker Desktop
 - Check Windows Services for Docker-related services
 
+
+
+
+
+
+
+
+
+

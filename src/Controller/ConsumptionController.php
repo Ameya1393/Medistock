@@ -63,3 +63,12 @@ final class ConsumptionController extends AbstractController
     }
 }
 
+
+
+
+
+
+
+
+
+

@@ -41,7 +41,7 @@
                         {% for item in predictions %}
                         {% set drug = item.drug %}
                         {% set pred = item.prediction %}
-                        <tr class="{% if pred.isUrgent %}table-danger{% elseif pred.isWarning %}table-warning{% endif %}">
+                        <tr class="{% if pred.isUrgent|default(false) %}table-danger{% elseif pred.isWarning|default(false) %}table-warning{% endif %}">
                             <td><strong>{{ drug.name }}</strong></td>
                             <td>{{ drug.category }}</td>
                             <td>
@@ -52,7 +52,7 @@
                             <td>{{ drug.threshold }}</td>
                             <td>
                                 {% if pred.daysUntilStockout is not null %}
-                                    <span class="badge {% if pred.isUrgent %}bg-danger{% elseif pred.isWarning %}bg-warning{% else %}bg-info{% endif %} fs-6">
+                                    <span class="badge {% if pred.isUrgent|default(false) %}bg-danger{% elseif pred.isWarning|default(false) %}bg-warning{% else %}bg-info{% endif %} fs-6">
                                         {{ pred.daysUntilStockout }} days
                                     </span>
                                 {% else %}
@@ -72,11 +72,11 @@
                                 </span>
                             </td>
                             <td>
-                                {% if pred.isUrgent %}
+                                {% if pred.isUrgent|default(false) %}
                                     <span class="badge bg-danger">
                                         <i class="bi bi-exclamation-triangle-fill"></i> URGENT
                                     </span>
-                                {% elseif pred.isWarning %}
+                                {% elseif pred.isWarning|default(false) %}
                                     <span class="badge bg-warning text-dark">
                                         <i class="bi bi-exclamation-triangle"></i> WARNING
                                     </span>
@@ -110,4 +110,12 @@
     </div>
 </div>
 {% endblock %}
+
+
+
+
+
+
+
+
 

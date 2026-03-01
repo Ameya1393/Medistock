@@ -19,8 +19,8 @@
     <!-- Stockout Prediction Card -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card shadow-sm {% if stockoutPrediction.isUrgent %}border-danger{% elseif stockoutPrediction.isWarning %}border-warning{% endif %}">
-                <div class="card-header {% if stockoutPrediction.isUrgent %}bg-danger{% elseif stockoutPrediction.isWarning %}bg-warning{% else %}bg-info{% endif %} text-white">
+            <div class="card shadow-sm {% if stockoutPrediction.isUrgent|default(false) %}border-danger{% elseif stockoutPrediction.isWarning|default(false) %}border-warning{% endif %}">
+                <div class="card-header {% if stockoutPrediction.isUrgent|default(false) %}bg-danger{% elseif stockoutPrediction.isWarning|default(false) %}bg-warning{% else %}bg-info{% endif %} text-white">
                     <h5 class="mb-0">
                         <i class="bi bi-exclamation-triangle-fill"></i> Stockout Prediction
                     </h5>
@@ -55,7 +55,7 @@
                                 <tr>
                                     <th>Days Until Stockout:</th>
                                     <td>
-                                        <span class="badge {% if stockoutPrediction.isUrgent %}bg-danger{% elseif stockoutPrediction.isWarning %}bg-warning{% else %}bg-info{% endif %} fs-5">
+                                        <span class="badge {% if stockoutPrediction.isUrgent|default(false) %}bg-danger{% elseif stockoutPrediction.isWarning|default(false) %}bg-warning{% else %}bg-info{% endif %} fs-5">
                                             {{ stockoutPrediction.daysUntilStockout }} days
                                         </span>
                                     </td>
@@ -76,11 +76,11 @@
                             </table>
                         </div>
                         <div class="col-md-6">
-                            <div class="alert {% if stockoutPrediction.isUrgent %}alert-danger{% elseif stockoutPrediction.isWarning %}alert-warning{% else %}alert-info{% endif %}">
+                            <div class="alert {% if stockoutPrediction.isUrgent|default(false) %}alert-danger{% elseif stockoutPrediction.isWarning|default(false) %}alert-warning{% else %}alert-info{% endif %}">
                                 <h6><i class="bi bi-info-circle"></i> Prediction Message</h6>
                                 <p class="mb-0">{{ stockoutPrediction.message }}</p>
                             </div>
-                            {% if stockoutPrediction.isUrgent or stockoutPrediction.isWarning %}
+                            {% if stockoutPrediction.isUrgent|default(false) or stockoutPrediction.isWarning|default(false) %}
                             <div class="d-grid gap-2">
                                 <a href="{{ path('app_stock_update', {'id': drug.id}) }}" class="btn btn-primary">
                                     <i class="bi bi-pencil-square"></i> Update Stock Now
@@ -161,22 +161,40 @@
 <script>
     const ctx = document.getElementById('consumptionChart').getContext('2d');
     
+    // Format dates for better display
+    function formatDate(dateStr) {
+        const date = new Date(dateStr + 'T00:00:00');
+        const month = date.toLocaleString('default', { month: 'short' });
+        const day = date.getDate();
+        return `${day} ${month}`;
+    }
+    
     const historicalData = {{ historical|json_encode|raw }};
     const predictionData = {{ consumptionPredictions|json_encode|raw }};
     
-    const historicalLabels = historicalData.map(d => d.date);
-    const historicalValues = historicalData.map(d => d.quantity);
+    const historicalLabels = historicalData.map(d => formatDate(d.date));
+    const historicalValues = historicalData.map(d => parseInt(d.quantity) || 0);
     
-    const predictionLabels = predictionData.map(d => d.date);
-    const predictionValues = predictionData.map(d => d.predicted);
-    const upperBounds = predictionData.map(d => d.upperBound ?? null);
-    const lowerBounds = predictionData.map(d => d.lowerBound ?? null);
+    const predictionLabels = predictionData.map(d => formatDate(d.date));
+    const predictionValues = predictionData.map(d => parseInt(d.predicted) || 0);
+    const upperBounds = predictionData.map(d => d.upperBound ? parseInt(d.upperBound) : null);
+    const lowerBounds = predictionData.map(d => d.lowerBound ? parseInt(d.lowerBound) : null);
     
     const allLabels = [...historicalLabels, ...predictionLabels];
     const allHistorical = [...historicalValues, ...Array(predictionLabels.length).fill(null)];
     const allPredictions = [...Array(historicalLabels.length).fill(null), ...predictionValues];
     const allUpperBounds = [...Array(historicalLabels.length).fill(null), ...upperBounds];
     const allLowerBounds = [...Array(historicalLabels.length).fill(null), ...lowerBounds];
+    
+    // Find max value for better Y-axis scaling
+    const allValues = [
+        ...historicalValues.filter(v => v !== null), 
+        ...predictionValues.filter(v => v !== null),
+        ...upperBounds.filter(v => v !== null),
+        ...lowerBounds.filter(v => v !== null)
+    ];
+    const maxValue = Math.max(...allValues, 1);
+    const yAxisMax = Math.ceil(maxValue * 1.1); // Add 10% padding
     
     new Chart(ctx, {
         type: 'line',
@@ -188,7 +206,9 @@
                 borderColor: 'rgb(75, 192, 192)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 tension: 0.1,
-                spanGaps: true
+                spanGaps: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
             }, {
                 label: 'Predicted Consumption',
                 data: allPredictions,
@@ -196,7 +216,9 @@
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderDash: [5, 5],
                 tension: 0.1,
-                spanGaps: true
+                spanGaps: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
             }, {
                 label: 'Upper Bound',
                 data: allUpperBounds,
@@ -221,25 +243,56 @@
             plugins: {
                 title: {
                     display: true,
-                    text: 'Consumption History and 14-Day Prediction'
+                    text: 'Consumption History and 14-Day Prediction',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
                 },
                 legend: {
                     display: true,
                     position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + (context.parsed.y !== null ? context.parsed.y : 'N/A') + ' units';
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
+                    max: yAxisMax,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0,
+                        callback: function(value) {
+                            return Number.isInteger(value) ? value : '';
+                        }
+                    },
                     title: {
                         display: true,
-                        text: 'Quantity'
+                        text: 'Quantity (units)',
+                        font: {
+                            weight: 'bold'
+                        }
                     }
                 },
                 x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        autoSkip: true,
+                        maxTicksLimit: 15
+                    },
                     title: {
                         display: true,
-                        text: 'Date'
+                        text: 'Date',
+                        font: {
+                            weight: 'bold'
+                        }
                     }
                 }
             }
@@ -248,4 +301,12 @@
 </script>
 {% endif %}
 {% endblock %}
+
+
+
+
+
+
+
+
 
